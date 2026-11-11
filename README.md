@@ -8,7 +8,7 @@ Writeups de mi paso por los wargames de [OverTheWire](https://overthewire.org/wa
 
 | Wargame | Enfoque | Progreso | Writeups |
 |---------|---------|----------|----------|
-| Natas | Seguridad web | Niveles 0 → 5 (en progreso) | [natas-00-04.md](Natas/natas-00-04.md) |
+| Natas | Seguridad web | Niveles 0 → 10 (en progreso) | [natas-00-04.md](Natas/natas-00-04.md), [natas-05-09.md](Natas/natas-05-09.md) |
 
 ## Video
 
