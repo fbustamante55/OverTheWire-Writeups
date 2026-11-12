@@ -390,16 +390,23 @@ Table: users
 +----------------------------------+----------+
 | password                         | username |
 +----------------------------------+----------+
-| 6P151OntQe                       | bob      |
-| HLwuGKts2w                       | charlie  |
-| hROtsfM734                       | alice    |
-| Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb | natas16  |
+| [redacted]                       | bob      |
+| [redacted]                       | charlie  |
+| [redacted]                       | alice    |
+| [redacted]                       | natas16  |
 +----------------------------------+----------+
 ```
 
 - **Password obtenida (`natas16`):** `[redacted]`
 
 ### Lección aprendida
-Blind SQLi demuestra que incluso sin output de datos, una respuesta booleana es suficiente para exfiltrar información completa — solo toma más requests (máx. 62 × 32 = 1984 para un charset alfanumérico de 32 chars). La defensa es idéntica a SQLi clásica: **prepared statements**. El hecho de que la app no muestre datos no la protege si la query es injectable.
+Blind SQLi demuestra que incluso sin output de datos, una respuesta booleana es suficiente para exfiltrar información completa — solo toma más requests (como máximo 62 × 32 = 1984 con un charset alfanumérico de 62 caracteres y una password de 32). La defensa es idéntica a SQLi clásica: **prepared statements**. El hecho de que la app no muestre datos no la protege si la query es injectable.
 
 ---
+
+## Conclusiones y recomendaciones
+
+- **Listas blancas, no negras:** un filtro de caracteres prohibidos (natas10) siempre deja algún vector abierto.
+- **Criptografía real:** XOR con key fija (natas11) se rompe con un solo plaintext conocido. Usar HMAC o cifrado autenticado.
+- **Uploads seguros:** validar el tipo real, renombrar el archivo, reprocesar la imagen y servir desde un directorio sin ejecución (natas12 y natas13).
+- **Prepared statements:** previenen tanto el login bypass (natas14) como la inyección ciega (natas15). Que la app no muestre datos no la protege.
