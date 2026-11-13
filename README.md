@@ -8,7 +8,7 @@ Writeups de mi paso por los wargames de [OverTheWire](https://overthewire.org/wa
 
 | Wargame | Enfoque | Progreso | Writeups |
 |---------|---------|----------|----------|
-| Natas | Seguridad web | Niveles 0 → 15 (en progreso) | [0-4](Natas/natas-00-04.md) · [5-9](Natas/natas-05-09.md) · [10-15](Natas/natas-10-15.md) |
+| Natas | Seguridad web | Niveles 0 → 16 (en progreso) | [0-4](Natas/natas-00-04.md) · [5-9](Natas/natas-05-09.md) · [10-16](Natas/natas-10-16.md) |
 
 ## Natas: nivel por nivel
 
@@ -29,6 +29,7 @@ Writeups de mi paso por los wargames de [OverTheWire](https://overthewire.org/wa
 | 13 | Upload validado solo por magic bytes | Archivo polyglot JPEG + PHP |
 | 14 | SQL Injection (login bypass) | `" or 1=1 -- ` |
 | 15 | Blind SQL Injection (booleana) | sqlmap `--technique=B --prefix --suffix` |
+| 16 | Blind Command Injection | `$(...)` dentro de comillas dobles, script Python |
 
 ## Video
 
@@ -51,7 +52,7 @@ OverTheWire-Writeups/
 ├── Natas/
 │   ├── natas-00-04.md
 │   ├── natas-05-09.md
-│   └── natas-10-15.md
+│   └── natas-10-16.md
 └── README.md
 ```
 
