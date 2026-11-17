@@ -8,7 +8,7 @@ Writeups de mi paso por los wargames de [OverTheWire](https://overthewire.org/wa
 
 | Wargame | Enfoque | Progreso |
 |---------|---------|----------|
-| Natas | Seguridad web | Niveles 0 → 18 (en progreso) |
+| Natas | Seguridad web | Niveles 0 → 19 (en progreso) |
 
 ## Natas: nivel por nivel
 
@@ -33,6 +33,7 @@ Writeups de mi paso por los wargames de [OverTheWire](https://overthewire.org/wa
 | [16](Natas/natas-16.md) | Blind Command Injection | `$(...)` dentro de comillas dobles, script Python |
 | [17](Natas/natas-17.md) | Time-based Blind SQLi | `SLEEP()` + `IF()`, medición de tiempo en Python |
 | [18](Natas/natas-18.md) | Session-ID prediction | Fuerza bruta de `PHPSESSID` (1-640) vía cookie |
+| [19](Natas/natas-19.md) | Session-ID prediction (ID codificado) | PHPSESSID = hex de `NUMERO-admin`, fuerza bruta 1-640 |
 
 ## Video
 
@@ -56,7 +57,8 @@ OverTheWire-Writeups/
 │   ├── natas-00.md
 │   ├── natas-01.md
 │   ├── ...
-│   └── natas-18.md
+│   ├── natas-18.md
+│   └── natas-19.md
 └── README.md
 ```
 
