@@ -1,16 +1,28 @@
-# Natas Level 19 → Level 20
+# Natas 19 → 20: Session-ID prediction (ID codificado)
 
-> ⚠️ Spoilers: las contraseñas están omitidas (`[redacted]`). Lo importante es el método.
+[← Nivel 18](natas-18.md) · [Índice](../README.md)
 
-- **URL:** `http://natas19.natas.labs.overthewire.org`
-- **Credenciales:** `natas19` / `[redacted]`
+| Campo | Detalle |
+|-------|---------|
+| **Wargame** | [OverTheWire: Natas](https://overthewire.org/wargames/natas/) |
+| **Categoría** | Gestión de sesiones |
+| **Debilidad** | [CWE-334](https://cwe.mitre.org/data/definitions/334.html): Small Space of Random Values |
+| **Herramientas** | DevTools del navegador, `xxd`, Python (`requests`) |
+| **URL** | `http://natas19.natas.labs.overthewire.org` |
+| **Credenciales** | `natas19` / `[redacted]` |
 
-## Análisis y Explotación
+> [!NOTE]
+> Las contraseñas y secretos están omitidos (`[redacted]`). El objetivo es documentar el método, no la respuesta.
+
+## Resumen
+El ID de sesión es el hexadecimal de `NUMERO-usuario`; la codificación no agrega seguridad y el espacio de IDs sigue siendo de 640 valores.
+
+## Análisis y explotación
 El nivel avisa: *"usa casi el mismo código que el anterior, pero los session IDs ya no son secuenciales"*. Es el mismo ataque de natas18 (session-ID prediction), con una capa extra de codificación.
 
 ### Descubriendo el formato del ID
 
-Al loguearse con un usuario cualquiera (`test`) y mirar la cookie `PHPSESSID` en DevTools, ya no aparece un número pelado como en natas18, sino algo tipo:
+Al loguearse con un usuario cualquiera (`test`) y mirar la cookie `PHPSESSID` en DevTools, ya no aparece un número simple como en natas18, sino un valor como:
 
 ```
 3134342d74657374
@@ -63,7 +75,16 @@ Puntos clave:
 
 En esta ejecución el ID del admin fue **281** (`281-admin` → `3238312d61646d696e`), y la respuesta trajo las credenciales de natas20.
 
+## Resultado
+
 - **Password obtenida (`natas20`):** `[redacted]`
 
-## Lección aprendida
-Codificar **no es** cifrar. Pasar el ID de sesión a hex (o base64, o rot13) no agrega seguridad: es reversible con una línea y el contenido queda a la vista. El problema de fondo es el mismo que natas18 — el espacio de IDs sigue siendo chico y predecible (`rand(1, 640)`), y encima ahora se sabe que el username va embebido. La defensa real: identificadores de sesión largos, aleatorios y opacos (el manejador nativo de PHP), sin estructura adivinable ni datos del usuario adentro.
+## Lección aprendida y mitigación
+Codificar **no es** cifrar. Pasar el ID de sesión a hex (o base64, o rot13) no agrega seguridad: es reversible con una línea y el contenido queda a la vista. El problema de fondo es el mismo que natas18 — el espacio de IDs sigue siendo pequeño y predecible (`rand(1, 640)`), y además ahora se sabe que el username va embebido. La defensa real: identificadores de sesión largos, aleatorios y opacos (el manejador nativo de PHP), sin estructura adivinable ni datos del usuario adentro.
+
+## Referencias
+- [CWE-334](https://cwe.mitre.org/data/definitions/334.html): Small Space of Random Values
+- [OverTheWire: Natas](https://overthewire.org/wargames/natas/)
+
+---
+[← Nivel 18](natas-18.md) · [Índice](../README.md)

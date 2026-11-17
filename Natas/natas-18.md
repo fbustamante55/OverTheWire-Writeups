@@ -1,11 +1,23 @@
-# Natas Level 18 → Level 19
+# Natas 18 → 19: Session-ID prediction
 
-> ⚠️ Spoilers: las contraseñas están omitidas (`[redacted]`). Lo importante es el método.
+[← Nivel 17](natas-17.md) · [Índice](../README.md) · [Nivel 19 →](natas-19.md)
 
-- **URL:** `http://natas18.natas.labs.overthewire.org`
-- **Credenciales:** `natas18` / `[redacted]`
+| Campo | Detalle |
+|-------|---------|
+| **Wargame** | [OverTheWire: Natas](https://overthewire.org/wargames/natas/) |
+| **Categoría** | Gestión de sesiones |
+| **Debilidad** | [CWE-334](https://cwe.mitre.org/data/definitions/334.html): Small Space of Random Values |
+| **Herramientas** | Python (`requests`) |
+| **URL** | `http://natas18.natas.labs.overthewire.org` |
+| **Credenciales** | `natas18` / `[redacted]` |
 
-## Análisis y Explotación
+> [!NOTE]
+> Las contraseñas y secretos están omitidos (`[redacted]`). El objetivo es documentar el método, no la respuesta.
+
+## Resumen
+Los identificadores de sesión se generan en un rango de solo 640 valores, por lo que se puede recorrer el espacio completo hasta dar con la sesión del admin.
+
+## Análisis y explotación
 La página pide loguearse como `admin` para mostrar las credenciales de natas19. El código fuente revela la lógica de sesión:
 
 ```php
@@ -37,7 +49,7 @@ function print_credentials() {
 **Lo que hay que notar:**
 1. El login como `admin` **no sirve**: `isValidAdminLogin()` siempre devuelve `0` (el `return 1` está comentado).
 2. Lo único que distingue a un admin de un usuario normal es su **sesión**: `$_SESSION["admin"] == 1`.
-3. Cada sesión se identifica por la cookie **`PHPSESSID`**, y ese ID se genera con `rand(1, 640)` — un rango **chico y predecible**.
+3. Cada sesión se identifica por la cookie **`PHPSESSID`**, y ese ID se genera con `rand(1, 640)` — un rango **pequeño y predecible**.
 
 ### El vector: Session-ID prediction (brute force)
 
@@ -73,7 +85,16 @@ Puntos clave:
 
 En esta ejecución el ID del admin resultó ser **119**, y la respuesta mostró las credenciales de natas19.
 
+## Resultado
+
 - **Password obtenida (`natas19`):** `[redacted]`
 
-## Lección aprendida
-Los identificadores de sesión deben ser **largos, aleatorios e impredecibles** (PHP por defecto usa 128+ bits). Acá el ID salía de `rand(1, 640)`: un espacio de solo 640 valores que se recorre entero en segundos. Nunca hay que generar session IDs con un rango acotado ni con un PRNG débil — un atacante puede adivinar o forzar la sesión de otro usuario (session prediction / hijacking). La defensa es usar el manejador de sesiones nativo sin tocar la generación del ID.
+## Lección aprendida y mitigación
+Los identificadores de sesión deben ser **largos, aleatorios e impredecibles** (PHP por defecto usa 128+ bits). Aquí el ID salía de `rand(1, 640)`: un espacio de solo 640 valores que se recorre entero en segundos. Nunca hay que generar session IDs con un rango acotado ni con un PRNG débil — un atacante puede adivinar o forzar la sesión de otro usuario (session prediction / hijacking). La defensa es usar el manejador de sesiones nativo sin tocar la generación del ID.
+
+## Referencias
+- [CWE-334](https://cwe.mitre.org/data/definitions/334.html): Small Space of Random Values
+- [OverTheWire: Natas](https://overthewire.org/wargames/natas/)
+
+---
+[← Nivel 17](natas-17.md) · [Índice](../README.md) · [Nivel 19 →](natas-19.md)

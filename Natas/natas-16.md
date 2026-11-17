@@ -1,11 +1,23 @@
-# Natas Level 16 → Level 17
+# Natas 16 → 17: Blind Command Injection
 
-> ⚠️ Spoilers: las contraseñas están omitidas (`[redacted]`). Lo importante es el método.
+[← Nivel 15](natas-15.md) · [Índice](../README.md) · [Nivel 17 →](natas-17.md)
 
-- **URL:** `http://natas16.natas.labs.overthewire.org`
-- **Credenciales:** `natas16` / `[redacted]`
+| Campo | Detalle |
+|-------|---------|
+| **Wargame** | [OverTheWire: Natas](https://overthewire.org/wargames/natas/) |
+| **Categoría** | Inyección |
+| **Debilidad** | [CWE-78](https://cwe.mitre.org/data/definitions/78.html): OS Command Injection |
+| **Herramientas** | Python (`requests`) |
+| **URL** | `http://natas16.natas.labs.overthewire.org` |
+| **Credenciales** | `natas16` / `[redacted]` |
 
-## Análisis y Explotación
+> [!NOTE]
+> Las contraseñas y secretos están omitidos (`[redacted]`). El objetivo es documentar el método, no la respuesta.
+
+## Resumen
+El filtro bloquea comillas, backticks y separadores, pero no `$(...)`; la sustitución de comandos dentro de comillas dobles da un oráculo booleano para extraer la contraseña.
+
+## Análisis y explotación
 Mismo buscador de palabras que natas9/natas10, pero con el filtro de caracteres más estricto de la serie. El código mete el input **dentro de comillas dobles**:
 
 ```php
@@ -24,7 +36,7 @@ Dentro de comillas dobles en bash, casi todo es texto literal **menos tres cosas
 
 Como el output de ese `grep` interno no se muestra directamente, se usa la misma lógica booleana que en natas15: deducir la password carácter por carácter según una respuesta de sí/no.
 
-### El truco del sí/no
+### Oráculo booleano (sí/no)
 
 Se elige una palabra que **sí existe** en el diccionario (p. ej. `African`) y se le concatena un `$(grep ...)` que busca el prefijo candidato de la password de natas17:
 
@@ -82,7 +94,16 @@ Desglose de la petición clave:
 
 El script reconstruye los 32 caracteres en orden, probando `a-z`, `A-Z`, `0-9` en cada posición.
 
+## Resultado
+
 - **Password obtenida (`natas17`):** `[redacted]`
 
-## Lección aprendida
-Una *blocklist* de caracteres nunca es suficiente: aunque natas16 filtra comillas, backticks y separadores, olvida que `$(...)` sigue vivo dentro de comillas dobles. Igual que en natas10, la defensa correcta es `escapeshellarg()` sobre el input o, mejor aún, no pasar jamás entrada de usuario a un shell: usar APIs que no invoquen `/bin/sh` (p. ej. buscar en el diccionario desde el propio PHP). Y aun sin ver el output del comando, un canal booleano (aparece/no aparece) basta para exfiltrar un secreto completo.
+## Lección aprendida y mitigación
+Una *blocklist* de caracteres nunca es suficiente: aunque natas16 filtra comillas, backticks y separadores, olvida que `$(...)` sigue funcionando dentro de comillas dobles. Igual que en natas10, la defensa correcta es `escapeshellarg()` sobre el input o, mejor aún, no pasar jamás entrada de usuario a un shell: usar APIs que no invoquen `/bin/sh` (p. ej. buscar en el diccionario desde el propio PHP). Y aun sin ver el output del comando, un canal booleano (aparece/no aparece) basta para exfiltrar un secreto completo.
+
+## Referencias
+- [CWE-78](https://cwe.mitre.org/data/definitions/78.html): OS Command Injection
+- [OverTheWire: Natas](https://overthewire.org/wargames/natas/)
+
+---
+[← Nivel 15](natas-15.md) · [Índice](../README.md) · [Nivel 17 →](natas-17.md)

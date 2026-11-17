@@ -1,11 +1,23 @@
-# Natas Level 15 → Level 16
+# Natas 15 → 16: Blind SQL Injection (booleana)
 
-> ⚠️ Spoilers: las contraseñas están omitidas (`[redacted]`). Lo importante es el método.
+[← Nivel 14](natas-14.md) · [Índice](../README.md) · [Nivel 16 →](natas-16.md)
 
-- **URL:** `http://natas15.natas.labs.overthewire.org`
-- **Credenciales:** `natas15` / `[redacted]`
+| Campo | Detalle |
+|-------|---------|
+| **Wargame** | [OverTheWire: Natas](https://overthewire.org/wargames/natas/) |
+| **Categoría** | Inyección |
+| **Debilidad** | [CWE-89](https://cwe.mitre.org/data/definitions/89.html): SQL Injection |
+| **Herramientas** | `sqlmap` |
+| **URL** | `http://natas15.natas.labs.overthewire.org` |
+| **Credenciales** | `natas15` / `[redacted]` |
 
-## Análisis y Explotación
+> [!NOTE]
+> Las contraseñas y secretos están omitidos (`[redacted]`). El objetivo es documentar el método, no la respuesta.
+
+## Resumen
+La query es inyectable pero solo devuelve "existe / no existe"; esa respuesta booleana basta para extraer la contraseña carácter por carácter.
+
+## Análisis y explotación
 La aplicación solo tiene un campo de búsqueda de username y responde con dos mensajes posibles: `"This user exists."` o `"This user doesn't exist."` — nunca muestra datos de la DB directamente. El código:
 
 ```php
@@ -78,7 +90,16 @@ Table: users
 +----------------------------------+----------+
 ```
 
+## Resultado
+
 - **Password obtenida (`natas16`):** `[redacted]`
 
-## Lección aprendida
+## Lección aprendida y mitigación
 Blind SQLi demuestra que incluso sin output de datos, una respuesta booleana es suficiente para exfiltrar información completa — solo toma más requests (como máximo 62 × 32 = 1984 con un charset alfanumérico de 62 caracteres y una password de 32). La defensa es idéntica a SQLi clásica: **prepared statements**. El hecho de que la app no muestre datos no la protege si la query es injectable.
+
+## Referencias
+- [CWE-89](https://cwe.mitre.org/data/definitions/89.html): SQL Injection
+- [OverTheWire: Natas](https://overthewire.org/wargames/natas/)
+
+---
+[← Nivel 14](natas-14.md) · [Índice](../README.md) · [Nivel 16 →](natas-16.md)

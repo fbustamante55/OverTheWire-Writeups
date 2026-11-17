@@ -1,13 +1,26 @@
-# Natas Level 13 → Level 14
+# Natas 13 → 14: Upload validado solo por magic bytes
 
-> ⚠️ Spoilers: las contraseñas están omitidas (`[redacted]`). Lo importante es el método.
+[← Nivel 12](natas-12.md) · [Índice](../README.md) · [Nivel 14 →](natas-14.md)
 
-> ℹ️ Nota: el webshell PHP está escrito *defanged* (`<EXEC>` = la función `system` de PHP) para que el antivirus no lo detecte como malicioso al guardar el archivo. El payload real es la reconstrucción obvia.
+| Campo | Detalle |
+|-------|---------|
+| **Wargame** | [OverTheWire: Natas](https://overthewire.org/wargames/natas/) |
+| **Categoría** | Subida de archivos |
+| **Debilidad** | [CWE-434](https://cwe.mitre.org/data/definitions/434.html): Unrestricted Upload of File with Dangerous Type |
+| **Herramientas** | Burp Suite (Repeater), `printf`, `xxd` |
+| **URL** | `http://natas13.natas.labs.overthewire.org` |
+| **Credenciales** | `natas13` / `[redacted]` |
 
-- **URL:** `http://natas13.natas.labs.overthewire.org`
-- **Credenciales:** `natas13` / `[redacted]`
+> [!NOTE]
+> Las contraseñas y secretos están omitidos (`[redacted]`). El objetivo es documentar el método, no la respuesta.
 
-## Análisis y Explotación
+> [!NOTE]
+> El webshell PHP está escrito *defanged* (`<EXEC>` = la función `system` de PHP) para que el antivirus no lo detecte como malicioso al guardar el archivo. El payload real es la reconstrucción obvia.
+
+## Resumen
+El servidor valida el upload solo por sus primeros bytes; un archivo polyglot (cabecera JPEG + PHP) pasa la validación y se ejecuta como PHP.
+
+## Análisis y explotación
 Mismo vector que natas12 (campo `filename` controlado por el cliente), pero ahora el servidor agrega una validación de contenido real del archivo con `exif_imagetype()`:
 
 ```php
@@ -57,9 +70,18 @@ Límite adicional: el archivo no puede superar **1000 bytes** (≈ 1 KB), lo que
    ?cmd=wc+-c+/etc/natas_webpass/natas14
    # → 33 bytes (32 caracteres + salto de línea)
    ```
-   Quitando los bytes basura del inicio, la password completa de 32 caracteres queda:
+   Quitando los bytes basura del inicio, se obtiene la password completa de 32 caracteres.
+
+## Resultado
 
 - **Password obtenida (`natas14`):** `[redacted]`
 
-## Lección aprendida
+## Lección aprendida y mitigación
 `exif_imagetype()` valida únicamente la cabecera del archivo, es trivial anteponer los magic bytes de un formato de imagen válido y adjuntar cualquier payload después. La defensa robusta contra uploads maliciosos requiere **reprocesar la imagen completa** con una librería de imágenes (p. ej. recomprimirla con GD o Imagick), lo que destruye cualquier dato externo al formato. Además, los uploads deben servirse desde un directorio sin permisos de ejecución (`php_flag engine off`).
+
+## Referencias
+- [CWE-434](https://cwe.mitre.org/data/definitions/434.html): Unrestricted Upload of File with Dangerous Type
+- [OverTheWire: Natas](https://overthewire.org/wargames/natas/)
+
+---
+[← Nivel 12](natas-12.md) · [Índice](../README.md) · [Nivel 14 →](natas-14.md)

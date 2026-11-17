@@ -1,11 +1,23 @@
-# Natas Level 17 → Level 18
+# Natas 17 → 18: Time-based Blind SQL Injection
 
-> ⚠️ Spoilers: las contraseñas están omitidas (`[redacted]`). Lo importante es el método.
+[← Nivel 16](natas-16.md) · [Índice](../README.md) · [Nivel 18 →](natas-18.md)
 
-- **URL:** `http://natas17.natas.labs.overthewire.org`
-- **Credenciales:** `natas17` / `[redacted]`
+| Campo | Detalle |
+|-------|---------|
+| **Wargame** | [OverTheWire: Natas](https://overthewire.org/wargames/natas/) |
+| **Categoría** | Inyección |
+| **Debilidad** | [CWE-89](https://cwe.mitre.org/data/definitions/89.html): SQL Injection |
+| **Herramientas** | Burp Suite (Repeater), Python (`requests`) |
+| **URL** | `http://natas17.natas.labs.overthewire.org` |
+| **Credenciales** | `natas17` / `[redacted]` |
 
-## Análisis y Explotación
+> [!NOTE]
+> Las contraseñas y secretos están omitidos (`[redacted]`). El objetivo es documentar el método, no la respuesta.
+
+## Resumen
+La misma inyección de natas15, pero sin ninguna salida visible: el tiempo de respuesta, controlado con `SLEEP()`, sirve como canal lateral.
+
+## Análisis y explotación
 Casi idéntico a natas15: un buscador de username con la misma query vulnerable.
 
 ```php
@@ -20,11 +32,11 @@ if($res) {
 }
 ```
 
-**La diferencia clave:** los `echo` de "existe / no existe" están **comentados**. La respuesta HTTP se ve idéntica mandes lo que mandes — el canal booleano de natas15 desapareció. Mirar el contenido ya no sirve.
+**La diferencia clave:** los `echo` de "existe / no existe" están **comentados**. La respuesta HTTP es idéntica sin importar el input — el canal booleano de natas15 desapareció. Mirar el contenido ya no sirve.
 
 ### El vector: Time-based Blind SQLi
 
-Si la página no responde nada visible pero igual ejecuta tu SQL, el canal lateral que queda es el **tiempo de respuesta**. Se usa la función `SLEEP()` de MySQL: *"si mi condición es verdadera, dormí X segundos; si no, respondé al instante"*. Se mide cuánto tarda la respuesta:
+Si la página no responde nada visible pero igual ejecuta el SQL inyectado, el canal lateral que queda es el **tiempo de respuesta**. Se usa la función `SLEEP()` de MySQL: *"si mi condición es verdadera, duerme X segundos; si no, responde al instante"*. Se mide cuánto tarda la respuesta:
 - Tardó ~X seg más de lo normal → condición verdadera
 - Respondió rápido → falsa
 
@@ -32,7 +44,7 @@ Si la página no responde nada visible pero igual ejecuta tu SQL, el canal later
 ```sql
 " OR SLEEP(5) -- -
 ```
-> Ojo con el comentario: `-- ` necesita un espacio (o un carácter) después para que MySQL lo tome como comentario. `-- -` lo garantiza. Alternativa: `#` (URL-encodeado `%23`).
+> **Nota:** `-- ` necesita un espacio (o un carácter) después para que MySQL lo tome como comentario. `-- -` lo garantiza. Alternativa: `#` (URL-encodeado `%23`).
 
 En Burp Repeater, el tiempo de respuesta sale abajo a la derecha ("X millis"). La línea base era ~1200 ms; con el `SLEEP()` saltó a varios segundos, confirmando la inyección.
 
@@ -96,7 +108,16 @@ while len(password) < 32:
 print(f"[*] Password natas18: {password}")
 ```
 
+## Resultado
+
 - **Password obtenida (`natas18`):** `[redacted]`
 
-## Lección aprendida
+## Lección aprendida y mitigación
 Ocultar la salida de la query **no** mitiga una SQLi. Mientras el input siga concatenándose en la consulta, un canal lateral — aquí el tiempo de respuesta vía `SLEEP()` — basta para extraer todo carácter por carácter. La defensa es la misma de siempre: **prepared statements**. Comentar los `echo` solo sube el costo del ataque (más lento), no lo impide.
+
+## Referencias
+- [CWE-89](https://cwe.mitre.org/data/definitions/89.html): SQL Injection
+- [OverTheWire: Natas](https://overthewire.org/wargames/natas/)
+
+---
+[← Nivel 16](natas-16.md) · [Índice](../README.md) · [Nivel 18 →](natas-18.md)

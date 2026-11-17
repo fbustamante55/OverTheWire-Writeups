@@ -1,11 +1,23 @@
-# Natas Level 11 → Level 12
+# Natas 11 → 12: XOR con key estática
 
-> ⚠️ Spoilers: las contraseñas están omitidas (`[redacted]`). Lo importante es el método.
+[← Nivel 10](natas-10.md) · [Índice](../README.md) · [Nivel 12 →](natas-12.md)
 
-- **URL:** `http://natas11.natas.labs.overthewire.org`
-- **Credenciales:** `natas11` / `[redacted]`
+| Campo | Detalle |
+|-------|---------|
+| **Wargame** | [OverTheWire: Natas](https://overthewire.org/wargames/natas/) |
+| **Categoría** | Criptografía |
+| **Debilidad** | [CWE-327](https://cwe.mitre.org/data/definitions/327.html): Use of a Broken or Risky Cryptographic Algorithm |
+| **Herramientas** | Python, DevTools del navegador |
+| **URL** | `http://natas11.natas.labs.overthewire.org` |
+| **Credenciales** | `natas11` / `[redacted]` |
 
-## Análisis y Explotación
+> [!NOTE]
+> Las contraseñas y secretos están omitidos (`[redacted]`). El objetivo es documentar el método, no la respuesta.
+
+## Resumen
+La cookie de preferencias se protege con XOR y una key fija; con el plaintext por defecto conocido se recupera la key y se forja una cookie válida.
+
+## Análisis y explotación
 La aplicación guarda preferencias del usuario en una cookie `data`, "protegida" con XOR y luego codificada en base64. El código fuente revela el flujo completo:
 
 ```php
@@ -78,7 +90,16 @@ key = plaintext XOR ciphertext
 5. **Nueva cookie forjada:** `EGAgHwQ1IxYYMSQYGSZxTUk7NgRJbnEVDCE8GwQwcU1JYTURDSQ1EUk/`
 6. Se reemplazó el valor de la cookie `data` en DevTools → Application → Cookies y se recargó la página.
 
+## Resultado
+
 - **Password obtenida (`natas12`):** `[redacted]`
 
-## Lección aprendida
+## Lección aprendida y mitigación
 XOR **no es cifrado seguro** cuando se usa con una key estática y corta. Al conocer el plaintext (aquí el valor por defecto del array), se recupera la key trivialmente con una sola operación. Para proteger cookies se debe usar HMAC (firma criptográfica) o cifrado autenticado (AES-GCM), nunca XOR con key fija.
+
+## Referencias
+- [CWE-327](https://cwe.mitre.org/data/definitions/327.html): Use of a Broken or Risky Cryptographic Algorithm
+- [OverTheWire: Natas](https://overthewire.org/wargames/natas/)
+
+---
+[← Nivel 10](natas-10.md) · [Índice](../README.md) · [Nivel 12 →](natas-12.md)

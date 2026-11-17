@@ -1,11 +1,23 @@
-# Natas Level 14 → Level 15
+# Natas 14 → 15: SQL Injection (login bypass)
 
-> ⚠️ Spoilers: las contraseñas están omitidas (`[redacted]`). Lo importante es el método.
+[← Nivel 13](natas-13.md) · [Índice](../README.md) · [Nivel 15 →](natas-15.md)
 
-- **URL:** `http://natas14.natas.labs.overthewire.org`
-- **Credenciales:** `natas14` / `[redacted]`
+| Campo | Detalle |
+|-------|---------|
+| **Wargame** | [OverTheWire: Natas](https://overthewire.org/wargames/natas/) |
+| **Categoría** | Inyección |
+| **Debilidad** | [CWE-89](https://cwe.mitre.org/data/definitions/89.html): SQL Injection |
+| **Herramientas** | Navegador |
+| **URL** | `http://natas14.natas.labs.overthewire.org` |
+| **Credenciales** | `natas14` / `[redacted]` |
 
-## Análisis y Explotación
+> [!NOTE]
+> Las contraseñas y secretos están omitidos (`[redacted]`). El objetivo es documentar el método, no la respuesta.
+
+## Resumen
+El login concatena el input en la query SQL, lo que permite saltarse la autenticación con una condición siempre verdadera.
+
+## Análisis y explotación
 La aplicación muestra un formulario de login (username + password). El código construye la query SQL concatenando los inputs del usuario **directamente**, sin sanitización:
 
 ```php
@@ -50,9 +62,11 @@ Desglose:
 
 La query retorna todas las filas de la tabla → `mysqli_num_rows() > 0` → login exitoso.
 
+## Resultado
+
 - **Password obtenida (`natas15`):** `[redacted]`
 
-## Lección aprendida
+## Lección aprendida y mitigación
 La concatenación directa de input del usuario en queries SQL es la causa raíz de SQL Injection. La defensa correcta es usar **prepared statements** (sentencias preparadas) con parámetros enlazados (`?` o `:nombre`), de modo que el motor SQL nunca interprete el input como código. Con `mysqli`:
 
 ```php
@@ -62,3 +76,10 @@ mysqli_stmt_execute($stmt);
 ```
 
 Así, cualquier comilla o palabra SQL que meta el usuario queda como texto literal, nunca como instrucción.
+
+## Referencias
+- [CWE-89](https://cwe.mitre.org/data/definitions/89.html): SQL Injection
+- [OverTheWire: Natas](https://overthewire.org/wargames/natas/)
+
+---
+[← Nivel 13](natas-13.md) · [Índice](../README.md) · [Nivel 15 →](natas-15.md)
